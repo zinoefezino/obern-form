@@ -62,7 +62,7 @@
         </div>
 
         <!-- Star Rating -->
-        <div class="flex justify-center gap-2 mb-8" id="starContainer">
+        <div class="flex justify-center gap-2 mb-2" id="starContainer">
           <i
             class="star text-4xl text-gray-300 fa-regular fa-star"
             data-rating="1"
@@ -85,6 +85,14 @@
           ></i>
         </div>
 
+        <!-- Error Message -->
+        <p
+          id="ratingError"
+          class="text-red-500 text-sm text-center mb-4 hidden"
+        >
+          Please rate our services before submitting!
+        </p>
+
         <!-- Rating Display -->
         <div class="text-center mb-6">
           <p class="text-lg font-medium">
@@ -106,6 +114,7 @@
             rows="4"
             class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none transition-all duration-300 outline-none"
             placeholder="Tell us about your experience..."
+            required
           ></textarea>
         </div>
 
@@ -171,12 +180,15 @@
       // Star Rating Functionality
       const stars = document.querySelectorAll(".star");
       const ratingText = document.getElementById("ratingText");
+      const ratingError = document.getElementById("ratingError");
       let currentRating = 0;
 
       stars.forEach((star) => {
         star.addEventListener("click", () => {
           currentRating = parseInt(star.dataset.rating);
           updateStars(currentRating);
+          // Hide error message when user selects a star
+          ratingError.classList.add("hidden");
         });
 
         star.addEventListener("mouseover", () => {
@@ -223,8 +235,23 @@
       const closeModal = document.getElementById("closeModal");
       const modalStars = document.getElementById("modalStars");
       const modalRatingText = document.getElementById("modalRatingText");
+      const commentTextarea = document.getElementById("comment");
 
       submitBtn.addEventListener("click", () => {
+        // Validate that a rating is selected
+        if (currentRating === 0) {
+          ratingError.classList.remove("hidden");
+          return;
+        } else {
+          ratingError.classList.add("hidden");
+        }
+
+        // Validate that comment is filled
+        if (commentTextarea.value.trim() === "") {
+          commentTextarea.focus();
+          return;
+        }
+
         // Show modal with animation
         modal.classList.remove("opacity-0", "pointer-events-none");
         modalContent.classList.remove("scale-95");
