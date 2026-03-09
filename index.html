@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hotel Rating Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+      .star {
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          color 0.2s;
+      }
+      .star:hover {
+        transform: scale(1.2);
+      }
+      .modal-backdrop {
+        backdrop-filter: blur(4px);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex items-center justify-center p-4">
+    <!-- Main Form Container -->
+    <div class="w-full max-w-md">
+      <!-- Header with Logo -->
+      <div class="text-center mb-8">
+        <div class="inline-block p-4 bg-white rounded-full shadow-lg mb-4">
+          <img
+            src="logo.jpeg"
+            alt="Hotel Logo"
+            class="w-20 h-20 object-contain"
+          />
+        </div>
+        <h1 class="text-2xl font-bold text-gray-800">Welcome to OBERN HOTEL</h1>
+        <p class="text-gray-600 mt-2">We value your feedback</p>
+      </div>
+
+      <!-- Rating Form -->
+      <div class="rounded-2xl shadow-2xl p-8">
+        <!-- Please Rate Us Text -->
+        <div class="text-center mb-6">
+          <h2 class="text-xl font-semibold text-gray-700">Please Rate Us</h2>
+          <p class="text-gray-500 text-sm mt-1">
+            Tap the stars to rate your experience
+          </p>
+        </div>
+
+        <!-- Star Rating -->
+        <div class="flex justify-center gap-2 mb-8" id="starContainer">
+          <i
+            class="star text-4xl text-gray-300 fa-regular fa-star"
+            data-rating="1"
+          ></i>
+          <i
+            class="star text-4xl text-gray-300 fa-regular fa-star"
+            data-rating="2"
+          ></i>
+          <i
+            class="star text-4xl text-gray-300 fa-regular fa-star"
+            data-rating="3"
+          ></i>
+          <i
+            class="star text-4xl text-gray-300 fa-regular fa-star"
+            data-rating="4"
+          ></i>
+          <i
+            class="star text-4xl text-gray-300 fa-regular fa-star"
+            data-rating="5"
+          ></i>
+        </div>
+
+        <!-- Rating Display -->
+        <div class="text-center mb-6">
+          <p class="text-lg font-medium">
+            <span id="ratingText" class="text-gray-600">0</span>
+            <span class="text-gray-400">/ 5 stars</span>
+          </p>
+        </div>
+
+        <!-- Comment Textarea -->
+        <div class="mb-6">
+          <label
+            for="comment"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Your Comments
+          </label>
+          <textarea
+            id="comment"
+            rows="4"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none transition-all duration-300 outline-none"
+            placeholder="Tell us about your experience..."
+          ></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          id="submitBtn"
+          class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+        >
+          Submit Review
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <p class="text-center text-gray-500 text-sm mt-6">
+        Thank you for staying with us!
+      </p>
+    </div>
+
+    <!-- Modal -->
+    <div
+      id="modal"
+      class="fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300 z-50"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full transform scale-95 transition-transform duration-300"
+        id="modalContent"
+      >
+        <!-- Success Icon -->
+        <div class="text-center mb-6">
+          <div
+            class="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4"
+          >
+            <i class="fas fa-check text-4xl text-green-500"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-800">Thank You!</h3>
+          <p class="text-gray-600 mt-2">
+            Your review has been submitted successfully.
+          </p>
+        </div>
+
+        <!-- Rating Summary -->
+        <div class="bg-amber-50 rounded-xl p-4 mb-6">
+          <div class="flex items-center justify-center gap-2 mb-2">
+            <span id="modalStars" class="text-amber-400"></span>
+          </div>
+          <p
+            id="modalRatingText"
+            class="text-center text-gray-700 font-medium"
+          ></p>
+        </div>
+
+        <!-- Close Button -->
+        <button
+          id="closeModal"
+          class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // Star Rating Functionality
+      const stars = document.querySelectorAll(".star");
+      const ratingText = document.getElementById("ratingText");
+      let currentRating = 0;
+
+      stars.forEach((star) => {
+        star.addEventListener("click", () => {
+          currentRating = parseInt(star.dataset.rating);
+          updateStars(currentRating);
+        });
+
+        star.addEventListener("mouseover", () => {
+          const rating = parseInt(star.dataset.rating);
+          highlightStars(rating);
+        });
+
+        star.addEventListener("mouseout", () => {
+          updateStars(currentRating);
+        });
+      });
+
+      function updateStars(rating) {
+        stars.forEach((star, index) => {
+          const starRating = index + 1;
+          if (starRating <= rating) {
+            star.classList.remove("fa-regular", "text-gray-300");
+            star.classList.add("fa-solid", "text-amber-400");
+          } else {
+            star.classList.remove("fa-solid", "text-amber-400");
+            star.classList.add("fa-regular", "text-gray-300");
+          }
+        });
+        ratingText.textContent = rating;
+      }
+
+      function highlightStars(rating) {
+        stars.forEach((star, index) => {
+          const starRating = index + 1;
+          if (starRating <= rating) {
+            star.classList.remove("fa-regular", "text-gray-300");
+            star.classList.add("fa-solid", "text-amber-300");
+          } else {
+            star.classList.remove("fa-solid", "text-amber-300");
+            star.classList.add("fa-regular", "text-gray-300");
+          }
+        });
+      }
+
+      // Modal Functionality
+      const modal = document.getElementById("modal");
+      const modalContent = document.getElementById("modalContent");
+      const submitBtn = document.getElementById("submitBtn");
+      const closeModal = document.getElementById("closeModal");
+      const modalStars = document.getElementById("modalStars");
+      const modalRatingText = document.getElementById("modalRatingText");
+
+      submitBtn.addEventListener("click", () => {
+        // Show modal with animation
+        modal.classList.remove("opacity-0", "pointer-events-none");
+        modalContent.classList.remove("scale-95");
+        modalContent.classList.add("scale-100");
+
+        // Update modal with rating
+        let starsHtml = "";
+        for (let i = 0; i < 5; i++) {
+          if (i < currentRating) {
+            starsHtml += '<i class="fas fa-star"></i>';
+          } else {
+            starsHtml += '<i class="far fa-star text-gray-300"></i>';
+          }
+        }
+        modalStars.innerHTML = starsHtml;
+        modalRatingText.textContent =
+          currentRating > 0
+            ? `You rated us ${currentRating} star${currentRating > 1 ? "s" : ""}!`
+            : "Thank you for your feedback!";
+      });
+
+      closeModal.addEventListener("click", () => {
+        // Hide modal with animation
+        modal.classList.add("opacity-0", "pointer-events-none");
+        modalContent.classList.remove("scale-100");
+        modalContent.classList.add("scale-95");
+
+        // Reset form
+        currentRating = 0;
+        updateStars(0);
+        document.getElementById("comment").value = "";
+      });
+
+      // Close modal when clicking outside
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          closeModal.click();
+        }
+      });
+    </script>
+  </body>
+</html>
